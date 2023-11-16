@@ -11,6 +11,7 @@ import (
 	"github.com/atombender/go-jsonschema/pkg/codegen"
 	"github.com/atombender/go-jsonschema/pkg/schemas"
 	"github.com/pkg/errors"
+	"golang.org/x/text/unicode/runenames"
 )
 
 type Config struct {
@@ -245,7 +246,16 @@ func (g *Generator) identifierize(s string) string {
 		return "Blank"
 	}
 
-	// FIXME: Better handling of non-identifier chars
+	var s2 string
+	var sb0 strings.Builder
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			sb0.WriteString(string(r))
+		} else {
+			sb0.WriteString(runenames.Name(r))
+		}
+	}
+	s = sb0.String()
 	var sb strings.Builder
 	for _, part := range splitIdentifierByCaseAndSeparators(s) {
 		_, _ = sb.WriteString(g.capitalize(part))
